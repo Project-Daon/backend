@@ -25,3 +25,10 @@ app.use(
 app.listen(app.get('port'), () => {
   console.log(`🚀 ProjectDaon API is running on port ${app.get('port')}`);
 });
+
+import indexRouter from './routes/index';
+import naverRouter from './routes/oauth/naver';
+import kakaoRouter from './routes/oauth/kakao';
+app.use('/', indexRouter);
+app.use('/login/naver', naverRouter);
+app.use('/login/kakao', kakaoRouter);
