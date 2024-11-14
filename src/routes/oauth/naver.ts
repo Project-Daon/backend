@@ -4,6 +4,15 @@ import mysql from "mysql2/promise";
 
 const router = express.Router();
 
+const pool = mysql.createPool({
+    connectTimeout: 60000,
+    host: process.env.MYSQL_HOST,
+    port: parseInt(process.env.MYSQL_PORT as string),
+    user: process.env.MYSQL_USER,
+    password: process.env.MYSQL_PASSWORD,
+    database: process.env.MYSQL_DATABASE,
+});
+
 router.get('/', async function (req, res) {
     const api_url = "https://nid.naver.com/oauth2.0/authorize";
     const redirect_uri = process.env.OAUTH_NAVER_REDIRECT_URI || '';
@@ -36,6 +45,13 @@ router.get('/callback', async function (req, res) {
 
             // TODO: Save the token data to the database
             // TODO: Add Login session(access_token) to res cookie
+
+            // {
+            //   access_token: 'AAAAO9yNL3DP6EHCMM7CFGeZVcfeziYvQjzYIzSOr4ABHwn-_5fUIiaZr30KqpAKZWqJf_7D-R6MtlS_dH87FBzmab8',
+            //   refresh_token: 'sJjwOaipKkxj0fAOJJkbiiRoLMsP9NNgbY8DipFcUSU7NxyweScVZ5o0ZeRbbAWrrpKPRBDQ0oTqC5Mmc0Jg4L9bisipY4WXl0dOW9JzlipAYJiiwlxDy6eklXXjlHsoWQVUpipI',
+            //   token_type: 'bearer',
+            //   expires_in: '3600'
+            // }
         })
 });
 
