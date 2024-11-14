@@ -55,14 +55,14 @@ router.get('/callback', async function (req, res) {
             httpOnly: true,
             secure: true,
             sameSite: 'none',
-            domain: '.datastec.kr',
+            domain: '.daon.today',
             maxAge: 3600000,
           });
           res.cookie('refresh_token', refresh, {
             httpOnly: true,
             secure: true,
             sameSite: 'none',
-            domain: '.datastec.kr',
+            domain: '.daon.today',
             maxAge: 31536000000,
           });
         })
