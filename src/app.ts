@@ -27,8 +27,10 @@ app.listen(app.get('port'), () => {
 });
 
 import indexRouter from './routes/index';
+import diaryRouter from './routes/diary';
 import naverRouter from './routes/oauth/naver';
 import kakaoRouter from './routes/oauth/kakao';
 app.use('/', indexRouter);
+app.use('/diary', diaryRouter);
 app.use('/login/naver', naverRouter);
 app.use('/login/kakao', kakaoRouter);
