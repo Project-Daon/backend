@@ -2,7 +2,7 @@ import express from 'express';
 import mysql from 'mysql2/promise';
 import { config } from 'dotenv';
 import { Request, Response } from 'express';
-import { authMiddleware } from '@/middleware/auth';
+import { authMiddleware } from './middleware/auth';
 
 config();
 const router = express.Router();

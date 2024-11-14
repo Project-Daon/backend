@@ -33,49 +33,45 @@ router.get('/callback', async function (req, res) {
       const tokenType = tokenData.token_type;
       const expiresIn = tokenData.expires_in;
 
-      await fetch(`https://kapi.kakao.com/v2/user/me`, {
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
+      // await fetch(`https://kapi.kakao.com/v2/user/me`, {
+      //   headers: {
+      //     Authorization: `Bearer ${accessToken}`,
+      //
+      //   },
+      // })
+      //   .then((res) => res.json())
+      //   .then(async (userData) => {
+      //     const access = jwt.sign({ id: id }, `${process.env.SECRET}`, {
+      //       expiresIn: '1h',
+      //     });
+      //     const refresh = jwt.sign({ id: id }, `${process.env.SECRET}`, {
+      //       expiresIn: '1y',
+      //     });
+      //     await con.execute('INSERT INTO refreshs (token, id) VALUES (?, ?)', [
+      //       refresh,
+      //       id,
+      //     ]);
+      //     res.cookie('access_token', access, {
+      //       httpOnly: true,
+      //       secure: true,
+      //       sameSite: 'none',
+      //       domain: '.daon.today',
+      //       maxAge: 3600000,
+      //     });
+      //     res.cookie('refresh_token', refresh, {
+      //       httpOnly: true,
+      //       secure: true,
+      //       sameSite: 'none',
+      //       domain: '.daon.today',
+      //       maxAge: 31536000000,
+      //     });
+      //   })
 
-        },
-      })
-        .then((res) => res.json())
-        .then(async (userData) => {
-          const access = jwt.sign({ id: id }, `${process.env.SECRET}`, {
-            expiresIn: '1h',
-          });
-          const refresh = jwt.sign({ id: id }, `${process.env.SECRET}`, {
-            expiresIn: '1y',
-          });
-          await con.execute('INSERT INTO refreshs (token, id) VALUES (?, ?)', [
-            refresh,
-            id,
-          ]);
-          res.cookie('access_token', access, {
-            httpOnly: true,
-            secure: true,
-            sameSite: 'none',
-            domain: '.daon.today',
-            maxAge: 3600000,
-          });
-          res.cookie('refresh_token', refresh, {
-            httpOnly: true,
-            secure: true,
-            sameSite: 'none',
-            domain: '.daon.today',
-            maxAge: 31536000000,
-          });
-        })
-
-
-
-
+      return res.json(tokenData);
     });
 
   // TODO: Save the token data to the database
   // TODO: Add Login session(access_token) to res cookie
-
-
 
   // {
   //   access_token: 'O8wX20xJ6SQCaN4T7Ux7a-LWEJYQSCYKAAAAAQopyNoAAAGTBsnRfm1lzvpaqIEo',
