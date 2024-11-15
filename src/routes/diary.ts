@@ -84,8 +84,7 @@ router.get(
         });
       } else {
         return res.status(500).json({
-          status: 500,
-          msg: 'DIARY_NOT_FOUND',
+          status: 200,
         });
       }
     } finally {
