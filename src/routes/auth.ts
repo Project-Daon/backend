@@ -84,7 +84,8 @@ router.post('/register', async function (req, res) {
 });
 
 router.post('/login', async function (req, res) {
-  const { email, password }: any = await req.body;
+  const { email = req.body.id, password }: any = await req.body;
+
 
   const connection = await pool.getConnection();
 
