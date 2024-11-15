@@ -15,7 +15,7 @@ app.use(cookieParser());
 app.use(helmet());
 app.use(
   cors({
-    origin: ['https://daon.today/', 'https://app.daon.today/'],
+    origin: ['https://daon.today/', 'https://app.daon.today/', 'http://localhost:5173/'],
     credentials: true,
     allowedHeaders: ['Content-Type', 'Authorization'],
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
