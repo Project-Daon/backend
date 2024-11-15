@@ -16,9 +16,9 @@ app.use(helmet());
 app.use(
   cors({
     origin: [
-      'https://daon.today/',
-      'https://app.daon.today/',
-      'http://localhost:5173/',
+      'https://daon.today',
+      'https://app.daon.today',
+      'http://localhost:5173',
     ],
     credentials: true,
     allowedHeaders: ['Content-Type', 'Authorization'],
