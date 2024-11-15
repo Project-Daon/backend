@@ -1,34 +1,61 @@
-CREATE TABLE Table_Users
+create table refreshs
 (
-    id         VARCHAR(36) PRIMARY KEY,
-    username   VARCHAR(50)         NOT NULL,
-    oauth      BOOLEAN             NOT NULL DEFAULT 0,
-    oauthId    VARCHAR(255),
-    email      VARCHAR(255) UNIQUE NOT NULL,
-    password   VARCHAR(255)        NOT NULL,
-    created_at TIMESTAMP                    DEFAULT CURRENT_TIMESTAMP
+    id      varchar(36)  not null,
+    token   varchar(255) not null
+        primary key,
+    expired timestamp    not null
 );
 
-CREATE TABLE Table_OAuth
+create table users
 (
-    id                 VARCHAR(36) PRIMARY KEY,
-    user_id            VARCHAR(36)  NOT NULL,
-    access_token       TEXT         NOT NULL,
-    refresh_token      TEXT         NOT NULL,
-    provider           VARCHAR(50)  NOT NULL,
-    provider_id        VARCHAR(255) NOT NULL,
-    access_expired_at  TIMESTAMP    NOT NULL,
-    refresh_expired_at TIMESTAMP    NOT NULL,
-    access_created_at  TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    logined_at         TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (user_id) REFERENCES Table_Users (id) ON DELETE CASCADE
+    id         varchar(36)                            not null
+        primary key,
+    username   varchar(50)                            not null,
+    nickname   varchar(50)                            not null,
+    oauth      tinyint(1) default 0                   not null,
+    oauthId    varchar(255)                           null,
+    email      varchar(255)                           not null,
+    password   varchar(255)                           not null,
+    created_at timestamp  default current_timestamp() null,
+    cash       int        default 0                   null,
+    constraint email
+        unique (email)
 );
 
-CREATE TABLE DIARY_Daily_Data
+create table diary
 (
-    user_id varchar(36) NOT NULL,
-    date VARCHAR(20) NOT NULL,
-    feel INTEGER NOT NULL,
-    content TEXT NOT NULL,
-    FOREIGN KEY (user_id) REFERENCES Table_Users (id) ON DELETE CASCADE
-)
+    user_id varchar(36) not null,
+    date    varchar(20) not null,
+    feel    int         not null,
+    weather int         not null,
+    title   text        not null,
+    content text        not null,
+    constraint diary_ibfk_1
+        foreign key (user_id) references users (id)
+            on delete cascade
+);
+
+create index user_id
+    on diary (user_id);
+
+create table oauth
+(
+    id                 varchar(36)                           not null
+        primary key,
+    user_id            varchar(36)                           not null,
+    access_token       text                                  not null,
+    refresh_token      text                                  not null,
+    provider           varchar(50)                           not null,
+    provider_id        varchar(255)                          not null,
+    access_expired_at  timestamp                             not null,
+    refresh_expired_at timestamp                             not null,
+    access_created_at  timestamp default current_timestamp() null,
+    logined_at         timestamp default current_timestamp() null,
+    constraint oauth_ibfk_1
+        foreign key (user_id) references users (id)
+            on delete cascade
+);
+
+create index user_id
+    on oauth (user_id);
+
