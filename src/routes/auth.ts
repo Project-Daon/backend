@@ -38,12 +38,15 @@ router.get('/', async function (req, res) {
 });
 
 router.post('/register', async function (req, res) {
-  const email: string = req.body.email;
-  const nickname: string = req.body.nickname;
-  const password: string = req.body.password;
+  const { email, password } = await req.body;
+  const nickname = req.body.nickname || '다온';
+
+  console.log(email, password, nickname);
+
+
 
   const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-  const nicknameRegex = /^[a-zA-Z0-9._+-]$/;
+  // const nicknameRegex = /^[a-zA-Z0-9._+-]$/;
   const passwordRegex =
     /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)|(?=.*[a-z])(?=.*[!@#$%^&*(),.?":{}|<>])(?=.*\d)|(?=.*[A-Z])(?=.*[!@#$%^&*(),.?":{}|<>])(?=.*\d)[\w!@#$%^&*(),.?":{}|<>]{8,}$/;
 
@@ -51,11 +54,6 @@ router.post('/register', async function (req, res) {
     return res.status(400).json({
       code: 'INVALID_EMAIL',
       message: '이메일 형식이 올바르지 않습니다',
-    });
-  } else if (!nicknameRegex.test(nickname)) {
-    return res.status(400).json({
-      code: 'INVALID_NICKNAME',
-      message: '닉네임 형식이 올바르지 않습니다',
     });
   } else if (!passwordRegex.test(password)) {
     return res.status(400).json({
@@ -71,7 +69,7 @@ router.post('/register', async function (req, res) {
 
   try {
     const [rows] = await connection.execute(
-      'INSERT INTO users (id, username, nickname, oauth, email, password) VALUES (?, ?, ?, ?, ?)',
+      'INSERT INTO users (id, username, nickname, oauth, email, password) VALUES (?, ?, ?, ?, ?, ?)',
       [uuidv4(), email, nickname, false, email, hash],
     );
 
