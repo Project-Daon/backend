@@ -33,6 +33,7 @@ type Table_Diary = {
   userid: string;
   date: string;
   feel: number;
+  weather: number;
   content: string;
 };
 
@@ -67,7 +68,7 @@ router.get(
       }
 
       const [diarys] = await connection.query(
-        'SELECT * FROM DIARY_Daily_Data WHERE user_id = ? AND date = ?',
+        'SELECT * FROM diary WHERE user_id = ? AND date = ?',
         [req.userId, date],
       );
 
@@ -78,6 +79,7 @@ router.get(
           status: 200,
           content: diary.content,
           feel: diary.feel,
+          weather: diary.weather,
           date: diary.date.replaceAll('-', ''),
         });
       } else {
@@ -97,7 +99,7 @@ router.post(
   '/',
   authMiddleware,
   async (req: RequestWithUserId, res: Response) => {
-    const { feel, content } = req.query;
+    const { feel, weather, content } = req.query;
     const connection = await pool.getConnection();
     try {
       const [accounts] = await connection.query(
@@ -120,20 +122,20 @@ router.post(
       const formattedDate = `${year}-${month}-${day}`;
 
       const [diarys] = await connection.query(
-        'SELECT * FROM DIARY_Daily_Data WHERE user_id = ? AND date = ?',
+        'SELECT * FROM diary WHERE user_id = ? AND date = ?',
         [req.userId, formattedDate],
       );
       const diary: Table_Diary = (diarys as Table_Diary[])[0];
 
       if (diary) {
         await connection.execute(
-          'UPDATE DIARY_Daily_Data SET feel = ?, content = ? WHERE user_id = ? AND date = ?',
-          [feel, content, req.userId, formattedDate], // Pass the actual values here
+          'UPDATE diary SET feel = ?, weather = ?, content = ? WHERE user_id = ? AND date = ?',
+          [feel, content, weather, req.userId, formattedDate], // Pass the actual values here
         );
       } else {
         await connection.execute(
-          'INSERT INTO DIARY_Daily_Data (user_id, date, feel, content) VALUES (?, ?, ?, ?)',
-          [req.userId, formattedDate, feel, content],
+          'INSERT INTO diary (user_id, date, feel, weather, content) VALUES (?, ?, ?, ?, ?)',
+          [req.userId, formattedDate, feel, weather, content],
         );
       }
 
