@@ -30,7 +30,7 @@ export const authMiddleware = async (
   res: Response,
   next: NextFunction | any,
 ) => {
-  const access_token = req.headers.authorization
+  let access_token = req.headers.authorization
     ? req.headers.authorization
     : req.cookies.access_token;
 
@@ -46,7 +46,7 @@ export const authMiddleware = async (
   }
 
   if (access_token) {
-    access_token.replace(`Bearer `, ``);
+    access_token = access_token.replace('Bearer ', '');
   }
 
   const connection = await pool.getConnection();
