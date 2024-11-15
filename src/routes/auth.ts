@@ -27,11 +27,8 @@ type Table_Users = {
   email: string;
   password: string;
   created_at: Date;
+  cash: number;
 };
-
-interface RequestWithUserId extends Request {
-  userId?: string;
-}
 
 router.get('/', async function (req, res) {
   return res.status(200).json({ message: 'Auth Router is working' });
