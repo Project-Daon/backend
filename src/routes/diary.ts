@@ -34,6 +34,7 @@ type Table_Diary = {
   date: string;
   feel: number;
   weather: number;
+  title: string;
   content: string;
 };
 
@@ -67,25 +68,46 @@ router.get(
         });
       }
 
-      const [diarys] = await connection.query(
-        'SELECT * FROM diary WHERE user_id = ? AND date = ?',
-        [req.userId, date],
-      );
+      if (date.includes('-')) {
+        const [diarys] = await connection.query(
+          'SELECT * FROM diary WHERE user_id = ? AND date = ?',
+          [req.userId, date],
+        );
 
-      const diary: Table_Diary = (diarys as Table_Diary[])[0];
+        const diary: Table_Diary = (diarys as Table_Diary[])[0];
 
-      if (diary) {
-        return res.status(200).json({
-          status: 200,
-          content: diary.content,
-          feel: diary.feel,
-          weather: diary.weather,
-          date: diary.date.replaceAll('-', ''),
-        });
+        if (diary) {
+          return res.status(200).json({
+            status: 200,
+            title: diary.title,
+            content: diary.content,
+            feel: diary.feel,
+            weather: diary.weather,
+            date: diary.date.replaceAll('-', ''),
+          });
+        } else {
+          return res.status(200).json({
+            status: 200,
+            msg: '검색된 일기가 없습니다',
+          });
+        }
       } else {
-        return res.status(500).json({
-          status: 200,
-        });
+        let query = 'SELECT * FROM diary WHERE user_id = ? AND date LIKE ?';
+        let queryDate = ``;
+        switch (date) {
+          case 'week':
+            query = 'SELECT * FROM diary WHERE user_id = ? AND date >= ?';
+            break;
+          case 'month':
+            query = 'SELECT * FROM diary WHERE user_id = ? AND date >= ?';
+            break;
+          case 'year':
+            query = 'SELECT * FROM diary WHERE user_id = ? AND date >= ?';
+            break;
+        }
+
+        const [diarys] = await connection.query(query, [req.userId, date]);
+
       }
     } finally {
       connection.release();
@@ -98,7 +120,7 @@ router.post(
   '/',
   authMiddleware,
   async (req: RequestWithUserId, res: Response) => {
-    const { feel, weather, content } = req.query;
+    const { feel, weather, title, content } = req.query;
     const connection = await pool.getConnection();
     try {
       const [accounts] = await connection.query(
@@ -128,13 +150,13 @@ router.post(
 
       if (diary) {
         await connection.execute(
-          'UPDATE diary SET feel = ?, weather = ?, content = ? WHERE user_id = ? AND date = ?',
-          [feel, content, weather, req.userId, formattedDate], // Pass the actual values here
+          'UPDATE diary SET feel = ?, weather = ?, title = ?, content = ? WHERE user_id = ? AND date = ?',
+          [feel, title, content, weather, req.userId, formattedDate], // Pass the actual values here
         );
       } else {
         await connection.execute(
-          'INSERT INTO diary (user_id, date, feel, weather, content) VALUES (?, ?, ?, ?, ?)',
-          [req.userId, formattedDate, feel, weather, content],
+          'INSERT INTO diary (user_id, date, feel, weather, title, content) VALUES (?, ?, ?, ?, ?, ?)',
+          [req.userId, formattedDate, feel, weather, title, content],
         );
       }
 

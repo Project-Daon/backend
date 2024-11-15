@@ -49,6 +49,7 @@ type Table_Diary = {
   date: string;
   feel: number;
   weather: number;
+  title: string;
   content: string;
 };
 
