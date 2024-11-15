@@ -38,7 +38,7 @@ app.listen(app.get('port'), () => {
 
 app.use('/', indexRouter);
 app.use('/diary', diaryRouter);
-app.use('/user', userRouter);
+app.use('/users', userRouter);
 app.use('/', authRouter);
 app.use('/login/naver', naverRouter);
 app.use('/login/kakao', kakaoRouter);
