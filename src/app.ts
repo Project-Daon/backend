@@ -6,7 +6,7 @@ import logger from 'morgan';
 import helmet from 'helmet';
 import indexRouter from './routes/index';
 import diaryRouter from './routes/diary';
-import userRouter from './routes/user';
+import userRouter from './routes/users';
 import authRouter from './routes/auth';
 import naverRouter from './routes/oauth/naver';
 import kakaoRouter from './routes/oauth/kakao';
