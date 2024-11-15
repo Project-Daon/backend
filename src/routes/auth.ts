@@ -158,4 +158,45 @@ router.post('/login', async function (req, res) {
   }
 });
 
+router.post('/authorize', async function (req: Request, res: express.Response) {
+  const { access_token, refresh_token } = req.cookies;
+  let accessToken: string = 'success';
+  let refreshToken: string = 'success';
+
+  if (access_token) {
+    try {
+      jwt.verify(access_token, process.env.JWT_SECRET as string);
+    } catch (err) {
+      const error = err as Error;
+      if (error.name === 'JsonWebTokenError') {
+        accessToken = 'incorrect';
+      } else if (error.name === 'TokenExpiredError') {
+        accessToken = 'expired';
+      }
+    }
+  } else {
+    accessToken = 'notfound';
+  }
+
+  if (refresh_token) {
+    try {
+      jwt.verify(refresh_token, process.env.JWT_SECRET as string);
+    } catch (err) {
+      const error = err as Error;
+      if (error.name === 'JsonWebTokenError') {
+        refreshToken = 'incorrect';
+      } else if (error.name === 'TokenExpiredError') {
+        refreshToken = 'expired';
+      }
+    }
+  } else {
+    refreshToken = 'notfound';
+  }
+
+  return res.status(200).json({
+    access_token: accessToken,
+    refresh_token: refreshToken,
+  });
+});
+
 export default router;
