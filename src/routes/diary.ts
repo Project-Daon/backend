@@ -41,17 +41,13 @@ router.get(
   '/',
   authMiddleware,
   async (req: RequestWithUserId, res: Response) => {
-    const { date } = await req.body;
-
-    let fmDate = '';
+    let date: string = (req.query.date as string) || new Date().toISOString().split('T')[0];
 
     if (/^\d{8}$/.test(date)) {
       const year = date.slice(0, 4);
       const month = date.slice(4, 6);
       const day = date.slice(6, 8);
-      fmDate = `${year}-${month}-${day}`;
-    } else {
-      fmDate = date;
+      date = `${year}-${month}-${day}`;
     }
 
     const connection = await pool.getConnection();
@@ -70,15 +66,9 @@ router.get(
         });
       }
 
-      const date = new Date();
-      const year = date.getFullYear();
-      const month = String(date.getMonth() + 1).padStart(2, '0');
-      const day = String(date.getDate()).padStart(2, '0');
-      const formattedDate = `${year}-${month}-${day}`;
-
       const [diarys] = await connection.query(
-        'SELECT * FROM DIARY_DAILY_DATA WHERE userid = ? AND date = ?',
-        [req.userId, formattedDate],
+        'SELECT * FROM DIARY_Daily_Data WHERE user_id = ? AND date = ?',
+        [req.userId, date],
       );
 
       const diary: Table_Diary = (diarys as Table_Diary[])[0];
@@ -87,6 +77,8 @@ router.get(
         return res.status(200).json({
           status: 200,
           content: diary.content,
+          feel: diary.feel,
+          date: diary.date.replaceAll('-', ''),
         });
       } else {
         return res.status(500).json({
@@ -98,12 +90,14 @@ router.get(
       connection.release();
     }
   },
+  authMiddleware,
 );
 
 router.post(
   '/',
   authMiddleware,
   async (req: RequestWithUserId, res: Response) => {
+    const { feel, content } = req.query;
     const connection = await pool.getConnection();
     try {
       const [accounts] = await connection.query(
@@ -125,33 +119,28 @@ router.post(
       const day = String(date.getDate()).padStart(2, '0');
       const formattedDate = `${year}-${month}-${day}`;
 
-      // Insert into DIARY_DAILY_DATA if not exists else update
-      await connection.execute(
-        'INSERT INTO DIARY_DAILY_DATA (userid, date, feel, content) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE content = ?',
-        [
-          req.userId,
-          formattedDate,
-          req.body.feel as number,
-          req.body.content as string,
-        ],
-      );
       const [diarys] = await connection.query(
-        'SELECT * FROM DIARY_DAILY_DATA WHERE userid = ? AND date = ?',
+        'SELECT * FROM DIARY_Daily_Data WHERE user_id = ? AND date = ?',
         [req.userId, formattedDate],
       );
-
       const diary: Table_Diary = (diarys as Table_Diary[])[0];
 
-      if (diary.content === req.body.content) {
-        return res.status(200).json({
-          status: 200,
-          msg: 'TASK_SUCCESS',
-        });
+      if (diary) {
+        await connection.execute(
+          'UPDATE DIARY_Daily_Data SET feel = ?, content = ? WHERE user_id = ? AND date = ?',
+          [feel, content, req.userId, formattedDate] // Pass the actual values here
+        );
       } else {
-        return res
-          .status(500)
-          .json({ status: 500, msg: 'INTERNAL_SERVER_ERROR' });
+        await connection.execute(
+          'INSERT INTO DIARY_Daily_Data (user_id, date, feel, content) VALUES (?, ?, ?, ?)',
+          [req.userId, formattedDate, feel, content],
+        );
       }
+
+      return res.status(200).json({
+        status: 200,
+        msg: 'TASK_SUCCESS',
+      });
     } finally {
       connection.release();
     }
