@@ -85,7 +85,7 @@ router.get(
       } else {
         return res.status(500).json({
           status: 500,
-          msg: 'INTERNAL_SERVER_ERROR',
+          msg: 'DIARY_NOT_FOUND',
         });
       }
     } finally {
