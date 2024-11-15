@@ -39,7 +39,6 @@ async function requestProfile(accessToken: string): Promise<NaverProfileVO> {
     });
 
     const data = response.data;
-    console.log(data);
 
     if (data["resultcode"] === '00') {
         return data["response"] as NaverProfileVO;

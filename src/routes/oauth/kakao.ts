@@ -27,7 +27,6 @@ router.get('/callback', async function (req, res) {
   await fetch(`${api_url}?${params.toString()}`)
     .then((res) => res.json())
     .then(async (tokenData) => {
-      console.log(tokenData);
       const accessToken = tokenData.access_token;
       const refreshToken = tokenData.refresh_token;
       const tokenType = tokenData.token_type;

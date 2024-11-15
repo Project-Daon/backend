@@ -41,10 +41,6 @@ router.post('/register', async function (req, res) {
   const { email, password } = await req.body;
   const nickname = req.body.nickname || '다온';
 
-  console.log(email, password, nickname);
-
-
-
   const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
   // const nicknameRegex = /^[a-zA-Z0-9._+-]$/;
   const passwordRegex =
@@ -89,8 +85,6 @@ router.post('/register', async function (req, res) {
 
 router.post('/login', async function (req, res) {
   const { email, password }: any = await req.body;
-
-  console.log(email, password);
 
   const connection = await pool.getConnection();
 

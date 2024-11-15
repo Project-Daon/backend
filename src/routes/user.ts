@@ -50,19 +50,13 @@ router.get(
   async (req: RequestWithUserId, res: Response) => {
     const connection = await pool.getConnection();
 
-    console.log(req.userId);
-
     try {
       const [accounts] = await connection.query(
         'SELECT * FROM users WHERE id = ?',
         [req.userId],
       );
 
-      console.log(accounts)
-
       const account: Table_Users = (accounts as Table_Users[])[0];
-
-      console.log(account)
 
       if (!account) {
         return res.status(500).json({
@@ -86,7 +80,6 @@ router.get(
           [account.id],
         );
         const oauthData: Table_OAuth = (oauth as Table_OAuth[])[0];
-        console.log(`provider: ${oauthData.provider}`);
         switch (oauthData.provider) {
           case 'google':
             return res.status(200).json({
