@@ -1,7 +1,6 @@
-import express from 'express';
+import express, { Request, Response } from 'express';
 import mysql from 'mysql2/promise';
 import { config } from 'dotenv';
-import { Request, Response } from 'express';
 import { authMiddleware } from './middleware/auth';
 
 config();

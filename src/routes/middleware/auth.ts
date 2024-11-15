@@ -2,7 +2,7 @@ import mysql, { FieldPacket, RowDataPacket } from 'mysql2/promise';
 import jwt from 'jsonwebtoken';
 import { config } from 'dotenv';
 
-import { Request, Response, NextFunction } from 'express';
+import { NextFunction, Request, Response } from 'express';
 
 config();
 
@@ -24,7 +24,6 @@ type Table_Refreshs = {
   id: string;
   expired: Date;
 };
-
 
 export const authMiddleware = async (
   req: RequestWithUserId,

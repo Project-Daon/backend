@@ -4,6 +4,12 @@ import cors from 'cors';
 import { config } from 'dotenv';
 import logger from 'morgan';
 import helmet from 'helmet';
+import indexRouter from './routes/index';
+import diaryRouter from './routes/diary';
+import userRouter from './routes/user';
+import authRouter from './routes/auth';
+import naverRouter from './routes/oauth/naver';
+import kakaoRouter from './routes/oauth/kakao';
 
 config();
 const app = express();
@@ -29,13 +35,6 @@ app.use(
 app.listen(app.get('port'), () => {
   console.log(`🚀 ProjectDaon API is running on port ${app.get('port')}`);
 });
-
-import indexRouter from './routes/index';
-import diaryRouter from './routes/diary';
-import userRouter from './routes/user';
-import authRouter from './routes/auth';
-import naverRouter from './routes/oauth/naver';
-import kakaoRouter from './routes/oauth/kakao';
 
 app.use('/', indexRouter);
 app.use('/diary', diaryRouter);

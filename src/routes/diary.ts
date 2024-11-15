@@ -1,7 +1,6 @@
-import express from 'express';
+import express, { Request, Response } from 'express';
 import mysql from 'mysql2/promise';
 import { config } from 'dotenv';
-import { Request, Response } from 'express';
 import { authMiddleware } from './middleware/auth';
 
 config();
@@ -41,7 +40,8 @@ router.get(
   '/',
   authMiddleware,
   async (req: RequestWithUserId, res: Response) => {
-    let date: string = (req.query.date as string) || new Date().toISOString().split('T')[0];
+    let date: string =
+      (req.query.date as string) || new Date().toISOString().split('T')[0];
 
     if (/^\d{8}$/.test(date)) {
       const year = date.slice(0, 4);
@@ -128,7 +128,7 @@ router.post(
       if (diary) {
         await connection.execute(
           'UPDATE DIARY_Daily_Data SET feel = ?, content = ? WHERE user_id = ? AND date = ?',
-          [feel, content, req.userId, formattedDate] // Pass the actual values here
+          [feel, content, req.userId, formattedDate], // Pass the actual values here
         );
       } else {
         await connection.execute(
