@@ -125,7 +125,28 @@ router.post('/login', async function (req, res) {
       { expiresIn: '14d' },
     );
 
+    await connection.query(
+      'INSERT INTO refreshs (token, id, expired) VALUES (?, ?, ?)',
+      [refreshToken, user.id, new Date(Date.now() + 1209600000 - 5)], // 쿠키 만료 시간 오차범위
+    );
+
     connection.release();
+
+    res.cookie('access_token', accessToken, {
+      httpOnly: true,
+      secure: true,
+      sameSite: 'none',
+      domain: '.daon.today',
+      maxAge: 3600000, // 1 hour
+    });
+
+    res.cookie('refresh_token', refreshToken, {
+      httpOnly: true,
+      secure: true,
+      sameSite: 'none',
+      domain: '.daon.today',
+      maxAge: 1209600000, // 14 days
+    });
 
     return res.status(200).json({
       code: 'SUCCESS',
