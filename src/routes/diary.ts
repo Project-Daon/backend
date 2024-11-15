@@ -41,11 +41,24 @@ router.get(
   '/',
   authMiddleware,
   async (req: RequestWithUserId, res: Response) => {
+    const { date } = await req.body;
+
+    let fmDate = '';
+
+    if (/^\d{8}$/.test(date)) {
+      const year = date.slice(0, 4);
+      const month = date.slice(4, 6);
+      const day = date.slice(6, 8);
+      fmDate = `${year}-${month}-${day}`;
+    } else {
+      fmDate = date;
+    }
+
     const connection = await pool.getConnection();
 
     try {
       const [accounts] = await connection.query(
-        'SELECT * FROM accounts WHERE id = ?',
+        'SELECT * FROM users WHERE id = ?',
         [req.userId],
       );
       const account: Table_Users = (accounts as Table_Users[])[0];
@@ -94,7 +107,7 @@ router.post(
     const connection = await pool.getConnection();
     try {
       const [accounts] = await connection.query(
-        'SELECT * FROM accounts WHERE id = ?',
+        'SELECT * FROM users WHERE id = ?',
         [req.userId],
       );
       const account: Table_Users = (accounts as Table_Users[])[0];
@@ -138,51 +151,6 @@ router.post(
         return res
           .status(500)
           .json({ status: 500, msg: 'INTERNAL_SERVER_ERROR' });
-      }
-    } finally {
-      connection.release();
-    }
-  },
-);
-
-router.get(
-  '/sdate',
-  authMiddleware,
-  async (req: RequestWithUserId, res: Response) => {
-    const connection = await pool.getConnection();
-    const formattedDate = req.query.date as string;
-
-    try {
-      const [accounts] = await connection.query(
-        'SELECT * FROM accounts WHERE id = ?',
-        [req.userId],
-      );
-      const account: Table_Users = (accounts as Table_Users[])[0];
-
-      if (!account) {
-        return res.status(500).json({
-          code: 'NOT_FOUND',
-          message: '유저를 찾을 수 없습니다',
-        });
-      }
-
-      const [diarys] = await connection.query(
-        'SELECT * FROM DIARY_DAILY_DATA WHERE userid = ? AND date = ?',
-        [req.userId, formattedDate],
-      );
-
-      const diary: Table_Diary = (diarys as Table_Diary[])[0];
-
-      if (diary) {
-        return res.status(200).json({
-          status: 200,
-          content: diary.content,
-        });
-      } else {
-        return res.status(500).json({
-          status: 500,
-          msg: 'INTERNAL_SERVER_ERROR',
-        });
       }
     } finally {
       connection.release();
