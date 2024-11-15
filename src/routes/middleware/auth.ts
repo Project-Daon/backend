@@ -31,14 +31,22 @@ export const authMiddleware = async (
   res: Response,
   next: NextFunction | any,
 ) => {
-  const access_token = req.cookies.access_token;
-  const refresh_token = req.cookies.refresh_token;
+  // console.log(req.headers.authorization);
+  let access_token = req.headers.authorization
+    ? req.headers.authorization
+    : req.cookies.access_token;
 
-  if (!refresh_token) {
+  console.log(access_token);
+
+  const refresh_token: string = req.cookies.refresh_token;
+
+  if (!access_token) {
     return res.status(401).json({
       code: 'UNAUTHORIZED',
       message: '인증이 필요한 서비스입니다',
     });
+  } else {
+    access_token = access_token.replace('Bearer ', '')
   }
   const connection = await pool.getConnection();
   if (!access_token) {

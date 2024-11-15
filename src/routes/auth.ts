@@ -89,9 +89,10 @@ router.post('/register', async function (req, res) {
   }
 });
 
-router.get('/login', async function (req, res) {
-  const email: string = req.body.email;
-  const password: string = req.body.password;
+router.post('/login', async function (req, res) {
+  const { email, password }: any = await req.body;
+
+  console.log(email, password);
 
   const connection = await pool.getConnection();
 
@@ -129,11 +130,6 @@ router.get('/login', async function (req, res) {
       { id: user.id, email: user.email },
       process.env.JWT_SECRET as string,
       { expiresIn: '14d' },
-    );
-
-    await connection.execute(
-      'INSERT INTO refreshs (token, id, expired) VALUES (?, ?, ?)',
-      [refreshToken, user.id, new Date(Date.now() + 14 * 24 * 60 * 60 * 1000)],
     );
 
     connection.release();

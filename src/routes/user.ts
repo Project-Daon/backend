@@ -50,12 +50,19 @@ router.get(
   async (req: RequestWithUserId, res: Response) => {
     const connection = await pool.getConnection();
 
+    console.log(req.userId);
+
     try {
       const [accounts] = await connection.query(
-        'SELECT * FROM accounts WHERE id = ?',
+        'SELECT * FROM users WHERE id = ?',
         [req.userId],
       );
+
+      console.log(accounts)
+
       const account: Table_Users = (accounts as Table_Users[])[0];
+
+      console.log(account)
 
       if (!account) {
         return res.status(500).json({
@@ -66,9 +73,12 @@ router.get(
 
       if (!account.oauth) {
         return res.status(200).json({
-          userid: account.id,
+          id: account.id,
           username: account.username,
+          nickname: account.nickname,
           email: account.email,
+          provider: 'self-hosted',
+          disabled: false,
         });
       } else {
         const [oauth] = await connection.query(
@@ -76,9 +86,11 @@ router.get(
           [account.id],
         );
         const oauthData: Table_OAuth = (oauth as Table_OAuth[])[0];
+        console.log(`provider: ${oauthData.provider}`);
         switch (oauthData.provider) {
           case 'google':
             return res.status(200).json({
+              provider: 'google',
               userid: account.id,
               username: account.username,
               email: account.email,
@@ -86,6 +98,7 @@ router.get(
             });
           case 'naver':
             return res.status(200).json({
+              provider: 'naver',
               userid: account.id,
               username: account.username,
               email: account.email,
@@ -93,15 +106,20 @@ router.get(
             });
           case 'kakao':
             return res.status(200).json({
+              provider: 'kakao',
               userid: account.id,
               username: account.username,
               email: account.email,
               kakao: oauthData.provider_id,
             });
           default:
-            return res.status(500).json({
-              code: 'INTERNAL_SERVER_ERROR',
-              message: '서버 내부 오류',
+            return res.status(200).json({
+              id: account.id,
+              username: account.username,
+              nickname: account.nickname,
+              email: account.email,
+              provider: 'self-hosted',
+              disabled: false,
             });
         }
       }
@@ -109,6 +127,7 @@ router.get(
       return res.status(500).json({
         code: 'INTERNAL_SERVER_ERROR',
         message: '서버 내부 오류',
+        error: e,
       });
     }
   },
