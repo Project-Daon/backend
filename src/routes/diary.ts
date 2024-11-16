@@ -136,7 +136,7 @@ router.post(
   '/',
   authMiddleware,
   async (req: RequestWithUserId, res: Response) => {
-    const { feel, weather, title, content } = req.query;
+    const { title, content, feel, weather } = req.query;
     const connection = await pool.getConnection();
     try {
       const [accounts] = await connection.query(
@@ -167,7 +167,7 @@ router.post(
       if (diary) {
         await connection.execute(
           'UPDATE diary SET feel = ?, weather = ?, title = ?, content = ? WHERE user_id = ? AND date = ?',
-          [feel, title, content, weather, req.userId, formattedDate], // Pass the actual values here
+          [feel, weather, title, content, req.userId, formattedDate], // Pass the actual values here
         );
       } else {
         await connection.execute(
