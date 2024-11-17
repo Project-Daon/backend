@@ -136,7 +136,7 @@ router.post(
   '/',
   authMiddleware,
   async (req: RequestWithUserId, res: Response) => {
-    const { title, content, feel, weather } = req.query;
+    const { title, content, feel, weather } = await req.body;
     const connection = await pool.getConnection();
     try {
       const [accounts] = await connection.query(
