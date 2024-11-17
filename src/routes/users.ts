@@ -146,6 +146,8 @@ router.get(
         message: '서버 내부 오류',
         error: e,
       });
+    } finally {
+      connection.release();
     }
   },
 );
