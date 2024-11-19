@@ -35,20 +35,15 @@ router.get('/', async function (req, res) {
 });
 
 router.post('/register', async function (req, res) {
-  const { email, password } = await req.body;
+  const { email = req.body.id, password } = await req.body;
   const nickname = req.body.nickname || '다온';
 
-  const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+  // const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
   // const nicknameRegex = /^[a-zA-Z0-9._+-]$/;
   const passwordRegex =
     /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)|(?=.*[a-z])(?=.*[!@#$%^&*(),.?":{}|<>])(?=.*\d)|(?=.*[A-Z])(?=.*[!@#$%^&*(),.?":{}|<>])(?=.*\d)[\w!@#$%^&*(),.?":{}|<>]{8,}$/;
 
-  if (!emailRegex.test(email)) {
-    return res.status(400).json({
-      code: 'INVALID_EMAIL',
-      message: '이메일 형식이 올바르지 않습니다',
-    });
-  } else if (!passwordRegex.test(password)) {
+  if (!passwordRegex.test(password)) {
     return res.status(400).json({
       code: 'INVALID_PASSWORD',
       message: '비밀번호 형식이 올바르지 않습니다',
