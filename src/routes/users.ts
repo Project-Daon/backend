@@ -185,6 +185,6 @@ router.put(
       connection.release();
     }
   },
-)
+);
 
 export default router;
