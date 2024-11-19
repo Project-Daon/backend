@@ -160,6 +160,8 @@ export const authMiddleware = async (
             code: 'NEED_REFRESH',
             message: '토큰이 만료되었습니다',
           });
+        } finally {
+          connection.release();
         }
       } else {
         return res.status(401).json({
