@@ -1,4 +1,4 @@
-import express, { Request, Response } from 'express';
+import express, { Request, response, Response } from 'express';
 import mysql from 'mysql2/promise';
 import { config } from 'dotenv';
 import { authMiddleware } from './middleware/auth';
@@ -36,6 +36,7 @@ type Table_Diary = {
   weather: number;
   title: string;
   content: string;
+  analysis: string;
 };
 
 router.get(
@@ -104,13 +105,17 @@ router.get(
           feel: diaries[0].feel,
           weather: diaries[0].weather,
           date: diaries[0].date.replaceAll('-', ''),
-          results: {
-            title: diaries[0].title,
-            content: diaries[0].content,
-            feel: diaries[0].feel,
-            weather: diaries[0].weather,
-            date: diaries[0].date.replaceAll('-', ''),
-          },
+          analysis: JSON.parse(diaries[0].analysis),
+          results: [
+            {
+              title: diaries[0].title,
+              content: diaries[0].content,
+              feel: diaries[0].feel,
+              weather: diaries[0].weather,
+              date: diaries[0].date.replaceAll('-', ''),
+              analysis: JSON.parse(diaries[0].analysis),
+            },
+          ],
         });
       } else {
         return res.status(200).json({
@@ -122,6 +127,7 @@ router.get(
               feel: diary.feel,
               weather: diary.weather,
               date: diary.date.replaceAll('-', ''),
+              analysis: JSON.parse(diary.analysis),
             };
           }),
         });
@@ -164,15 +170,28 @@ router.post(
       );
       const diary: Table_Diary = (diarys as Table_Diary[])[0];
 
+      let analysis = { rage: 0, sadness: 0, happiness: 0, anxiety: 0 };
+      await fetch('http://localhost:3002/emotions', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ content: content }),
+      })
+        .then((res) => res.json())
+        .then((json) => {
+          analysis = json;
+        });
+
       if (diary) {
         await connection.execute(
-          'UPDATE diary SET feel = ?, weather = ?, title = ?, content = ? WHERE user_id = ? AND date = ?',
-          [feel, weather, title, content, req.userId, formattedDate], // Pass the actual values here
+          'UPDATE diary SET feel = ?, weather = ?, title = ?, content = ?, analysis = ? WHERE user_id = ? AND date = ?',
+          [feel, weather, title, content, analysis, req.userId, formattedDate], // Pass the actual values here
         );
       } else {
         await connection.execute(
-          'INSERT INTO diary (user_id, date, feel, weather, title, content) VALUES (?, ?, ?, ?, ?, ?)',
-          [req.userId, formattedDate, feel, weather, title, content],
+          'INSERT INTO diary (user_id, date, feel, weather, title, content, analysis) VALUES (?, ?, ?, ?, ?, ?, ?)',
+          [req.userId, formattedDate, feel, weather, title, content, analysis],
         );
       }
 
